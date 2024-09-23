@@ -8,8 +8,5 @@ gleam add --dev reference
 ```
 
 ```sh
-gleam run -m reference "examples" "examples.gleam"
-
-# TODO check that it is up to date (hash and compare)
-gleam run -m reference --check "examples" "examples.gleam"
+gleam run -m reference "my_examples_dir" "examples.gleam"
 ```
