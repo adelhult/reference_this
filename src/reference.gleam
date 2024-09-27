@@ -113,7 +113,7 @@ fn consume_module_doc(content: String) -> #(String, String) {
       result <> stripped_line <> "\n"
     })
 
-  let rest = rest |> string.join(with: "\n")
+  let rest = rest |> string.join(with: "\n") |> string.trim()
 
   #(doc, rest)
 }
