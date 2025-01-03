@@ -1,4 +1,4 @@
-name = "reference"
+name = "reference_this"
 version = "0.1.0"
 
 # Fill out these fields if you intend to generate HTML documentation or publish
@@ -6,7 +6,7 @@ version = "0.1.0"
 #
 description = "A development tool to reference other gleam files"
 licences = ["MIT"]
-repository = { type = "github", user = "adelhult", repo = "reference" }
+repository = { type = "github", user = "adelhult", repo = "reference_this" }
 # links = [{ title = "Website", href = "" }]
 #
 # For a full reference of all the available options, you can have a look at
