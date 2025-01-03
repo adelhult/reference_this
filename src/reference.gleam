@@ -1,7 +1,7 @@
 //// `reference` is a simple tool
-//// that reads a folder of gleam files and copies the
+//// that reads a folder of files (mainly .gleam) and copies the
 //// content into a gleam file as strings. This is useful if you, for
-//// instance, wish to build a custom SPA to display the examples/tutorials
+//// instance, wish to build a custom website to display the examples/tutorials
 //// for a gleam library.
 
 import argv
@@ -100,6 +100,7 @@ fn serialize_reference_list(references: List(Reference)) -> String {
 }
 
 fn consume_module_doc(content: String) -> #(String, String) {
+  // FIXME: we don't want to do this for non .gleam files
   // FIXME: this would fail on \r\n, is there really no split lines util?
   let lines = string.split(content, on: "\n")
 
@@ -118,6 +119,14 @@ fn consume_module_doc(content: String) -> #(String, String) {
   #(doc, rest)
 }
 
+fn allow_all_ext() -> glint.Flag(Bool) {
+  glint.bool_flag("allow-all-ext")
+  |> glint.flag_default(False)
+  |> glint.flag_help(
+    "If we wish to allow all file extensions (not only .gleam)",
+  )
+}
+
 fn run_cli() -> glint.Command(Nil) {
   // Setup CLI command
   use <- glint.command_help(
@@ -125,23 +134,25 @@ fn run_cli() -> glint.Command(Nil) {
   )
   use directory_handle <- glint.named_arg("INPUT_DIRECTORY")
   use output_file_handle <- glint.named_arg("OUTPUT_FILE")
-  use named, _args, _flags <- glint.command()
+  use allow_all_ext <- glint.flag(allow_all_ext())
+  use named, _args, flags <- glint.command()
 
   // resolve named args
   let directory = directory_handle(named)
   let output_file = output_file_handle(named)
+  let assert Ok(allowed_all_ext) = allow_all_ext(flags)
 
   // Run the actual command and output potential errors
-  case run(directory, output_file) {
+  case run(directory, output_file, allowed_all_ext) {
     Error(error) ->
       io.println_error("Error: " <> simplifile.describe_error(error))
     _ -> Nil
   }
 }
 
-fn run(directory: String, output_file: String) {
+fn run(directory: String, output_file: String, allowed_all_ext: Bool) {
   use files <- result.try(simplifile.get_files(directory))
-  let files = list.filter(files, is_gleam_file)
+  let files = list.filter(files, fn(f) { allowed_all_ext || is_gleam_file(f) })
 
   use files_content <- result.try(
     files
